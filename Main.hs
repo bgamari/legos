@@ -47,7 +47,7 @@ main = do
     let tracks = track 20 dps
     print $ M.keys tracks
     forM_ (M.assocs tracks) $ \(TID k,v)->do
-        TL.writeFile (printf "track-%03d" k) $ TB.toLazyText $ "%f\t%f\n"
+        TL.writeFile (printf "track-%03d" k) $ TB.toLazyText $ formatTrack v
     
 formatTrack :: [DataPoint] -> TB.Builder
 formatTrack = foldMap formatPoint 

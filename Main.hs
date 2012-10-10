@@ -15,9 +15,8 @@ import           Data.AffineSpace.Point
 import           Statistics.Sample                 
 
 import           Text.Printf
-import qualified Data.Text.Lazy.IO as TL
-import qualified Data.Text.Lazy.Builder as TB
-import           Data.Text.Lazy.Builder.RealFloat
+import qualified Data.ByteString.Lazy as BS
+import           Data.Csv                 
                  
 import           ReadData
 import           Track
@@ -36,7 +35,9 @@ trackOpts = TrackOpts
                     <> short 'd'
                     <> help "Maximum distance"
                      )
-                 
+
+tabSep = defaultEncodeOptions { encDelimiter = 9 }
+
 main = do
     args <- execParser $ info (helper <*> trackOpts)
            ( fullDesc
@@ -50,17 +51,20 @@ main = do
     let tracks = track 20 dps
     print $ M.keys tracks
     forM_ (M.assocs tracks) $ \(TID k,v)->do
-        TL.writeFile (printf "track-%03d" k) $ TB.toLazyText $ formatTrack v
-        print (k, meanVariance $ meanSqDispl v 10)
+        BS.writeFile (printf "track-%03d.points" k)
+            $ encodeWith tabSep $ V.map (\(t,P (x,y))->(t,x,y)) v
+        BS.writeFile (printf "track-%03d.displ" k)
+            $ encodeWith tabSep $ V.fromList
+            $ map (\tau-> (tau, mean $ meanSqDispl v tau)) 
+            $ map round $ logspace 1 1000 100
     
-formatTrack :: V.Vector DataPoint -> TB.Builder
-formatTrack = foldMap formatPoint 
-    where formatPoint (t,P (x,y)) = fmt x <> "\t" <> fmt y <> "\n"
-          fmt = formatRealFloat Generic (Just 3)
-
+logspace :: RealFloat a => a -> a -> Int -> [a]
+logspace a b n = [ exp $ log a + realToFrac i * d | i <- [0..n-1]]
+    where d = (log b - log a) / realToFrac n
+    
 meanSqDispl :: V.Vector DataPoint -> Time -> V.Vector Dist
 meanSqDispl points tau =
-    V.fromList $ mapMaybe f $ tailsV points
+    V.fromList $ mapMaybe f $ tailsV 10 points
     where f :: V.Vector DataPoint -> Maybe Dist
           f v | V.null v'  = Nothing
               | otherwise  = let (_,x)  = V.head v
@@ -68,8 +72,8 @@ meanSqDispl points tau =
                              in Just $ magnitudeSq $ x .-. x'
               where v' = V.drop tau v
     
-tailsV :: V.Vector a -> [V.Vector a]            
-tailsV v | V.null v = []
-         | otherwise = v : tailsV (V.tail v)
+tailsV :: Int -> V.Vector a -> [V.Vector a]            
+tailsV n v | V.null v = []
+           | otherwise = v : tailsV n (V.drop n v)
    
  

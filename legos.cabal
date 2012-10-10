@@ -17,4 +17,4 @@ cabal-version:       >=1.8
 executable legos
   main-is:              Main.hs
   -- other-modules:       
-  build-depends:       base ==4.6.*, containers ==0.5.*, vector-space ==0.8.*, vector-space-points ==0.1.*, mtl ==2.1.*, data-lens ==2.10.*, data-lens-template ==2.1.*, vector ==0.9.*, bytestring ==0.10.*, cassava ==0.1.*, optparse-applicative, text
+  build-depends:       base ==4.6.*, containers ==0.5.*, vector-space ==0.8.*, vector-space-points ==0.1.*, mtl ==2.1.*, data-lens ==2.10.*, data-lens-template ==2.1.*, vector ==0.9.*, bytestring ==0.10.*, cassava ==0.1.*, optparse-applicative, text, statistics

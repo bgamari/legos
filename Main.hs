@@ -1,15 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Data.Foldable    
-import           Options.Applicative
+import           Data.Foldable
+import           Data.Maybe
 import           Data.Monoid
+import           Options.Applicative
 
 import qualified Data.Vector as V
 import           Data.Vector (Vector)
 import qualified Data.Map as M
 
 import           Data.VectorSpace
+import           Data.AffineSpace
 import           Data.AffineSpace.Point
+import           Statistics.Sample                 
 
 import           Text.Printf
 import qualified Data.Text.Lazy.IO as TL
@@ -48,9 +51,25 @@ main = do
     print $ M.keys tracks
     forM_ (M.assocs tracks) $ \(TID k,v)->do
         TL.writeFile (printf "track-%03d" k) $ TB.toLazyText $ formatTrack v
+        print (k, meanVariance $ meanSqDispl v 10)
     
-formatTrack :: [DataPoint] -> TB.Builder
+formatTrack :: V.Vector DataPoint -> TB.Builder
 formatTrack = foldMap formatPoint 
     where formatPoint (t,P (x,y)) = fmt x <> "\t" <> fmt y <> "\n"
           fmt = formatRealFloat Generic (Just 3)
 
+meanSqDispl :: V.Vector DataPoint -> Time -> V.Vector Dist
+meanSqDispl points tau =
+    V.fromList $ mapMaybe f $ tailsV points
+    where f :: V.Vector DataPoint -> Maybe Dist
+          f v | V.null v'  = Nothing
+              | otherwise  = let (_,x)  = V.head v
+                                 (_,x') = V.head v'
+                             in Just $ magnitudeSq $ x .-. x'
+              where v' = V.drop tau v
+    
+tailsV :: V.Vector a -> [V.Vector a]            
+tailsV v | V.null v = []
+         | otherwise = v : tailsV (V.tail v)
+   
+ 

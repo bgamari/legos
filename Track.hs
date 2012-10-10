@@ -66,9 +66,9 @@ buildTrack maxDepth maxDist (t,pt) = do
                        tracks !%= M.insert tid [(t,pt)]
         Just tid -> tracks !%= M.update (\trk->Just $ (t,pt):trk) tid
 
-track :: Dist -> V.Vector DataPoint -> Map TrackID [DataPoint]
+track :: Dist -> V.Vector DataPoint -> Map TrackID (V.Vector DataPoint)
 track maxDist pts =
-    tracks ^$ execState f def
+    M.map V.fromList $ tracks ^$ execState f def
     where f = forM_ pts $ buildTrack 100 maxDist
           def = TState (TID 0) M.empty
 

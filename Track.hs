@@ -31,15 +31,16 @@ newtype TrackID = TID Int
                 deriving (Show, Ord, Eq, Num)
 type DataPoint = (Time, Point R2)
 
-backtracks :: Map TrackID [DataPoint] -> [Map TrackID (Time, Point R2)]
+
+backtracks :: Map TrackID [DataPoint] -> [Map TrackID DataPoint]
 backtracks trks
     | M.null trks  = []
     | otherwise    = fmap head trks : ( backtracks 
                                         $ M.filter (not . null)
                                         $ fmap tail trks
                                       )
-
-findTrack :: Int -> Dist -> Map TrackID [DataPoint] -> (Time, Point R2) -> Maybe TrackID
+    
+findTrack :: Int -> Dist -> Map TrackID [DataPoint] -> DataPoint -> Maybe TrackID
 findTrack maxDepth maxDist trks (t,pt) = f $ take maxDepth $ backtracks trks
     where f :: [Map TrackID (Time, Point R2)] -> Maybe TrackID
           f [] = Nothing

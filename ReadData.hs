@@ -52,7 +52,8 @@ parse =
     decodeWith opts . BS.dropWhile (/= fromIntegral (ord '\n'))
     where opts = defaultDecodeOptions { decDelimiter = fromIntegral $ ord '\t' }
 
+{-# INLINABLE readFramePts #-}
 readFramePts :: FilePath -> IO (Either String (Vector FramePt))
 readFramePts f =
     parse <$> BS.readFile f
-    
+

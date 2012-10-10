@@ -45,14 +45,15 @@ findTrack maxDepth maxDist trks (t,pt) = f $ take maxDepth $ backtracks trks
     where f :: [Map TrackID (Time, Point R2)] -> Maybe TrackID
           f [] = Nothing
           f (x:rest) =
-              let proposals = sortBy (compare `on` snd) 
-                            $ M.assocs 
+              let proposals :: [(TrackID, Dist)]
+                  proposals = M.assocs 
                             $ M.filter (< maxDist)
                             $ fmap (\(t,p)->pt `distance` p) x
               in case proposals of
-                     []            -> f rest
-                     (tid,dist):_  -> Just tid
-            
+                     []  -> f rest
+                     xs  -> let (tid,dist) = minimumBy (compare `on` snd) xs
+                                  in Just tid
+    
 data TrackState = TState { _lastTrack :: !TrackID
                          , _tracks    :: !(Map TrackID [DataPoint])
                          }

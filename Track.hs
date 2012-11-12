@@ -6,7 +6,6 @@ module Track ( track
              ) where
 
 import           Data.Foldable (forM_)       
-
 import qualified Data.Vector as V                
 import qualified Data.Map as M
 import           Data.Map (Map)
@@ -18,12 +17,8 @@ import           Data.AffineSpace
 import           Data.AffineSpace.Point
 
 import           Control.Monad.State.Strict hiding (forM_)
-import           Data.Lens.Common
-import           Data.Lens.Strict
-import           Data.Lens.Template
+import           Control.Lens
 
-import Debug.Trace
-                 
 type R2 = (Double, Double)       
 type Time = Int
 type Dist = Double
@@ -58,15 +53,15 @@ data TrackState = TState { _lastTrack :: !TrackID
                          , _tracks    :: !(Map TrackID [DataPoint])
                          }
                 deriving (Show, Eq)
-$( makeLens ''TrackState )
+makeLenses ''TrackState
                 
 buildTrack :: Int -> Dist -> (Time, Point R2) -> State TrackState ()
 buildTrack maxDepth maxDist (t,pt) = do
-    trks <- access tracks
+    trks <- use tracks
     void $ case findTrack maxDepth maxDist trks (t,pt) of
-        Nothing  -> do tid <- lastTrack !%%= \x->(x, x+1)
-                       tracks !%= M.insert tid [(t,pt)]
-        Just tid -> tracks !%= M.update (\trk->Just $ (t,pt):trk) tid
+        Nothing  -> do tid <- lastTrack %%= \x->(x, x+1)
+                       tracks %= M.insert tid [(t,pt)]
+        Just tid -> tracks %= M.update (\trk->Just $ (t,pt):trk) tid
 
 track :: Dist -> V.Vector DataPoint -> Map TrackID (V.Vector DataPoint)
 track maxDist pts =

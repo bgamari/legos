@@ -33,17 +33,19 @@ data FramePt = FramePt { fpId       :: {-# UNPACK #-} !Int
 framePt !id !area !x !y !circ !frame !ar !round !solidity =
     FramePt id area (P (x,y)) circ frame ar round solidity
 
+a .!! b = parseField $ a `V.unsafeIndex` b
+
 instance FromRecord FramePt where
     parseRecord v
-        | V.length v == 9  = framePt <$> v .! 0
-                                     <*> v .! 1
-                                     <*> v .! 2
-                                     <*> v .! 3
-                                     <*> v .! 4
-                                     <*> v .! 5
-                                     <*> v .! 6
-                                     <*> v .! 7
-                                     <*> v .! 8
+        | V.length v == 9  = framePt <$> v .!! 0
+                                     <*> v .!! 1
+                                     <*> v .!! 2
+                                     <*> v .!! 3
+                                     <*> v .!! 4
+                                     <*> v .!! 5
+                                     <*> v .!! 6
+                                     <*> v .!! 7
+                                     <*> v .!! 8
         | otherwise       = mzero 
 
 {-# INLINABLE parse #-}

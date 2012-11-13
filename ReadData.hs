@@ -33,7 +33,7 @@ data FramePt = FramePt { fpId       :: {-# UNPACK #-} !Int
 framePt !id !area !x !y !circ !frame !ar !round !solidity =
     FramePt id area (P (x,y)) circ frame ar round solidity
 
-a .!! b = parseField $ a `V.unsafeIndex` b
+a .!! b = parseField $! a `V.unsafeIndex` b
 
 instance FromRecord FramePt where
     parseRecord v

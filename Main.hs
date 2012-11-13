@@ -61,7 +61,7 @@ main = do
     printf "Read %d points\n" (V.length framePts)
     let dps = V.map (\fp->(fpId fp, fpPos fp)) framePts
     let tracks = track 20 dps
-    print $ M.keys tracks
+    printf "Found %d tracks\n" (M.size tracks)
     forM_ (M.assocs tracks) $ \(TID k,v)->do
         BS.writeFile (printf "track-%03d.points" k)
             $ encodeWith tabSep $ V.map (\(t,P (x,y))->(t,x,y)) v

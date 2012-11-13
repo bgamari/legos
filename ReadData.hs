@@ -19,14 +19,14 @@ import           Data.Char
 
 import           Track
                 
-data FramePt = FramePt { fpId       :: !Int
-                       , fpArea     :: !Int
-                       , fpPos      :: !(Point R2)
-                       , fpCirc     :: !Double
-                       , fpFrame    :: !Int
-                       , fpAR       :: !Double
-                       , fpRound    :: !Double
-                       , fpSolidity :: !Double
+data FramePt = FramePt { fpId       :: {-# UNPACK #-} !Int
+                       , fpArea     :: {-# UNPACK #-} !Int
+                       , fpPos      :: {-# UNPACK #-} !(Point R2)
+                       , fpCirc     :: {-# UNPACK #-} !Double
+                       , fpFrame    :: {-# UNPACK #-} !Int
+                       , fpAR       :: {-# UNPACK #-} !Double
+                       , fpRound    :: {-# UNPACK #-} !Double
+                       , fpSolidity :: {-# UNPACK #-} !Double
                        }
              deriving (Show)
      

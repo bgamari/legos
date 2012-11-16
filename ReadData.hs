@@ -51,7 +51,7 @@ instance FromRecord FramePt where
 {-# INLINABLE parse #-}
 parse :: BS.ByteString -> Either String (Vector FramePt)
 parse = 
-    decodeWith opts . BS.dropWhile (/= fromIntegral (ord '\n'))
+    decodeWith opts True
     where opts = defaultDecodeOptions { decDelimiter = fromIntegral $ ord '\t' }
 
 {-# INLINABLE readFramePts #-}

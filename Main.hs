@@ -64,7 +64,7 @@ main = do
     printf "Found %d tracks\n" (M.size tracks)
     forM_ (M.assocs tracks) $ \(TID k,v)->do
         BS.writeFile (printf "track-%03d.points" k)
-            $ encodeWith tabSep $ V.map (\(t,P (x,y))->(t,x,y)) v
+            $ encodeWith tabSep $ V.map (\(t,P (R2 x y))->(t,x,y)) v
         BS.writeFile (printf "track-%03d.displ" k)
             $ encodeWith tabSep $ V.fromList
             $ map (\tau -> (tau, mean $ meanSqDispl (dt0 args) v tau)) 

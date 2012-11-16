@@ -1,7 +1,8 @@
-{-# LANGUAGE TupleSections, TemplateHaskell, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TupleSections, TemplateHaskell,
+             GeneralizedNewtypeDeriving, TypeFamilies #-}
 
 module Track ( track
-             , R2, Time, Dist, DataPoint
+             , R2(..), Time, Dist, DataPoint
              , TrackID(..)
              ) where
 
@@ -19,7 +20,21 @@ import           Data.AffineSpace.Point
 import           Control.Monad.State.Strict hiding (forM_)
 import           Control.Lens
 
-type R2 = (Double, Double)       
+data R2 = R2 {-# UNPACK #-} !Double {-# UNPACK #-} !Double
+        deriving (Show, Eq)
+     
+instance AdditiveGroup R2 where
+    zeroV = R2 0 0
+    R2 x y ^+^ R2 x' y' = R2 (x+x') (y+y')
+    negateV (R2 x y) = R2 (-x) (-y)
+
+instance VectorSpace R2 where
+    type Scalar R2 = Double
+    a *^ R2 x y = R2 (a*x) (a*y)
+
+instance InnerSpace R2 where
+    R2 x y <.> R2 x' y' = x*x' + y*y'
+
 type Time = Int
 type Dist = Double
 newtype TrackID = TID Int

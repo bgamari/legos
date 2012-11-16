@@ -31,7 +31,7 @@ data FramePt = FramePt { fpId       :: {-# UNPACK #-} !Int
              deriving (Show)
      
 framePt !id !area !x !y !circ !frame !ar !round !solidity =
-    FramePt id area (P (x,y)) circ frame ar round solidity
+    FramePt id area (P (R2 x y)) circ frame ar round solidity
 
 a `index` b = parseField $! a `V.unsafeIndex` b
 
